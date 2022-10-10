@@ -23,6 +23,15 @@ ENTROPY_LOSS = 5e-3
 LR = 1e-4  # Lower lr stabilises training greatly
 
 
+def ppo_loss_with_KL_penalty(advantage, old_prediction):
+    def loss(y_true, y_pred):   
+        prob = K.sum(y_true * y_pred, axis=-1)
+        old_prob = K.sum(y_true * old_prediction, axis=-1)
+        r = prob/(old_prob + 1e-10)
+        return -K.mean(r * advantage - BETA* KL(old_prob,prob))
+    return loss
+
+
 def proximal_policy_optimization_loss(advantage, old_prediction):
     def loss(y_true, y_pred):
         prob = K.sum(y_true * y_pred, axis=-1)
