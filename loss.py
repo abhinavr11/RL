@@ -1,6 +1,9 @@
 import gym
 from keras import backend as K
 import numpy as np
+from tensorflow.keras.losses import KLDivergence 
+
+
 LOSS_CLIPPING = 0.2
 ENV = 'CartPole-v0'
 CONTINUOUS = False
@@ -21,7 +24,7 @@ HIDDEN_SIZE = 128
 NUM_LAYERS = 2
 ENTROPY_LOSS = 5e-3
 LR = 1e-4  # Lower lr stabilises training greatly
-
+KL = KLDivergence(reduction=tf.keras.losses.Reduction.NONE)
 
 def ppo_loss_with_KL_penalty(advantage, old_prediction):
     def loss(y_true, y_pred):   

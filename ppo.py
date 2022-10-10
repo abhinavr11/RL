@@ -4,6 +4,7 @@ from tensorflow.python.framework.ops import disable_eager_execution
 from keras.models import Model
 from keras.layers import Input, Dense
 from keras import backend as K
+from tensorflow.keras.losses import KLDivergence 
 from tensorflow.keras.optimizers import Adam
 from tensorboardX import SummaryWriter
 from loss import *
@@ -31,6 +32,7 @@ LR = 1e-4  # Lower lr stabilises training greatly
 DUMMY_ACTION, DUMMY_VALUE = np.zeros((1, NUM_ACTIONS)), np.zeros((1, 1))
 disable_eager_execution()
 
+KL = KLDivergence(reduction=tf.keras.losses.Reduction.NONE)
 
 class Agent:
     def __init__(self):
