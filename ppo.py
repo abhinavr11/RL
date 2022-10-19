@@ -9,7 +9,20 @@ from tensorflow.keras.optimizers import Adam
 from tensorboardX import SummaryWriter
 from loss import *
 
-ENV = 'CartPole-v0'
+import math
+from typing import Optional, Union
+
+import numpy as np
+
+import gym
+from gym import logger, spaces
+from gym.envs.classic_control import utils
+from gym.error import DependencyNotInstalled
+from numpy.linalg import inv
+from scipy.integrate import odeint
+from SatEnv.py import *
+
+#ENV = 'CartPole-v0'
 CONTINUOUS = False
 
 EPISODES = 100
@@ -22,8 +35,8 @@ GAMMA = 0.99
 
 BUFFER_SIZE = 2048
 BATCH_SIZE = 256
-NUM_ACTIONS = gym.make(ENV).action_space.n
-NUM_STATE = gym.make(ENV).observation_space.shape[0]
+NUM_ACTIONS = SatEnv().action_space
+NUM_STATE = SatEnv().observation_space.shape[0]
 HIDDEN_SIZE = 128
 NUM_LAYERS = 2
 ENTROPY_LOSS = 5e-3
@@ -42,7 +55,7 @@ class Agent:
         else:
             self.actor = self.build_actor_continuous()
 
-        self.env = gym.make(ENV)
+        self.env = SatEnv()
         print(self.env.action_space, 'action_space', self.env.observation_space, 'observation_space')
         self.episode = 0
         self.observation = self.env.reset()
@@ -80,6 +93,10 @@ class Agent:
                       loss=[proximal_policy_optimization_loss(
                           advantage=advantage,
                           old_prediction=old_prediction)],experimental_run_tf_function=False)
+        # model.compile(optimizer=Adam(lr=LR),
+        #               loss=[ppo_loss_with_KL_penalty(
+        #                   advantage=advantage,
+        #                   old_prediction=old_prediction)],experimental_run_tf_function=False)
         model.summary()
 
         return model
